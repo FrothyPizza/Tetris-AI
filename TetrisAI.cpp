@@ -13,7 +13,8 @@ namespace ts {
 		instant{ inst },
 		totalAttack{ 0 },
 		piecesPlaced{ 0 },
-		dead{ false } {
+		dead{ false },
+		factors{ mainFactors } {
 		//reserve some number
 		nextList.reserve(100);
 
@@ -37,19 +38,33 @@ namespace ts {
 		//gameState.matrix[2][HEIGHT - 2] = -1;
 		//gameState.matrix[3][HEIGHT - 2] = -1;
 		//gameState.matrix[4][HEIGHT - 2] = -1;
+
+
+		// 2 wide downstack testing
+		//for (int i = 0; i < WIDTH-2; ++i) 
+		//	for (int j = 7; j < HEIGHT; ++j) 
+		//		gameState.matrix[i][j] = 0;
+
+
 	}
 
 	TetrisAI::TetrisAI(std::vector<int> next, bool inst) : TetrisAI(inst) {
 		nextList = next;
+		
+	}
+
+	TetrisAI::TetrisAI(AIFactor factor) : TetrisAI(true) {
+		factors = factor;
 	}
 
 	int TetrisAI::doNextMove() {
+		if (isDead()) return 0;
 		if(!Globals::HOLDENABLED) gameState.canHold = false; ///////////////////////////////////////////////////////////////////////////
 
 		if (dead) {
 			//gameState.resetMatrix();
 			dead = false;
-			std::cout << piecesPlaced << '\n';
+			//std::cout << piecesPlaced << '\n';
 			return 0;
 		}
 		if (instant) return completelyPerformMove();
@@ -164,9 +179,9 @@ namespace ts {
 
 	void TetrisAI::generateNextMove() {
 		//currentMove = AI::makeAImove(gameState, curMino.tile, nextList, mainFactors, 0);
-		currentMove = findBestMove(mainFactors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS);
+		currentMove = findBestMove(factors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS);
 		//currentMove = getAIMove(mainFactors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS).first;
-		for (int i = 0; i < currentMove.size(); ++i) std::cout << '\n' << currentMove.at(i);
+		//for (int i = 0; i < currentMove.size(); ++i) std::cout << '\n' << currentMove.at(i);
 	}
 
 

@@ -194,6 +194,7 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 	
 }
 
+// This doens't work
 std::pair<std::vector<int>, float> ts::getAIMove(AIFactor& AIfactor, GameState& currentState, int minoIndex, std::vector<int>& nextList, float thisPathTotalAttackScore, int depth) {
 
 	if (depth == 0) {
@@ -340,6 +341,12 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 	// 0  1  0  1
 	// 1  0  1  0
 
+	if (Globals::GO_FOR_MOSTLY_TETRISES) {
+		int blocksInWell{ 0 };
+		for (int i = 0; i < HEIGHT; ++i)
+			if (gameState.matrix[0][i] >= 0) ++blocksInWell;
+		score += blocksInWell * AIfactor.blockInRightWell;
+	}
 
 
 	return score;
@@ -364,8 +371,10 @@ float ts::evaluateAttackScore(AIFactor& AIfactor, int attack, int clear) {
 		score += atkeff * AIfactor.attackEffeciency;
 	}
 
+	if (clear > 0 && clear != 4) score += AIfactor.didntClearTetris;
 
-	return 0; ///////////////////////////////////////////////////////////////////////////////////////////////
+
+	//return 0; ///////////////////////////////////////////////////////////////////////////////////////////////
 	return score;
 }
 

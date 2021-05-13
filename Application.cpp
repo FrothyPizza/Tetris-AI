@@ -18,7 +18,9 @@ void Application::initWindow() {
 	m_window = new sf::RenderWindow(m_videoMode, "Tetris", sf::Style::Titlebar | sf::Style::Close);
 }
 
-Application::Application() : playerGame{}, tetrisAI{ ts::Globals::AI_FULLY_PERFORM_MOVE } {
+Application::Application() : playerGame{},
+	tetrisAI{ ts::Globals::AI_FULLY_PERFORM_MOVE },
+	population{} {
 	initVars();
 	initWindow();
 
@@ -76,6 +78,15 @@ void Application::pollEvents() {
 
 void Application::update() {
 	pollEvents();
+
+	population.run();
+
+	tetrisAI.factors = population.bestFactorSoFar();
+	if (tetrisAI.isDead()) {
+		tetrisAI.reset();
+		tetrisAI.dead = false;
+	}
+	//ts::outputFactors(tetrisAI.factors);
 
 	if (!ts::Globals::TURN_BASED) { // if it isn't turn based, go on a fixed timer 
 		if (AIdelay.getElapsedTime().asMilliseconds() >= ts::Globals::AI_MOVE_DELAY_MS) {

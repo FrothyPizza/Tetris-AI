@@ -150,6 +150,7 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerTetrisGame.cpp" />
+    <ClCompile Include="Population.cpp" />
     <ClCompile Include="TetrisAI.cpp" />
     <ClCompile Include="TetrisRender.cpp" />
     <ClCompile Include="Tetromino.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="PlayerTetrisGame.h" />
+    <ClInclude Include="Population.h" />
     <ClInclude Include="TetrisAI.h" />
     <ClInclude Include="TetrisRender.h" />
     <ClInclude Include="Tetromino.h" />

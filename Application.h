@@ -5,7 +5,7 @@
 
 #include "PlayerTetrisGame.h"
 #include "TetrisAI.h"
-
+#include "Population.h"
 #include <future>
 
 
@@ -26,6 +26,7 @@ private:
 	ts::TetrisAI tetrisAI;
 	sf::Clock AIdelay{};
 
+	Population population;
 
 	
 

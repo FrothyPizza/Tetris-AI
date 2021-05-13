@@ -20,12 +20,15 @@ namespace ts {
 		Tetromino curMino;
 		std::vector<int> nextList;
 
+		AIFactor factors;
+
 		std::vector<int> currentMove;
 
 		int piecesPlaced;
 		int totalAttack;
 
 		// default, makes own next list
+		TetrisAI(AIFactor factor);
 		TetrisAI(bool inst);
 		TetrisAI(std::vector<int> next, bool inst);
 
@@ -45,9 +48,9 @@ namespace ts {
 		sf::RectangleShape rect;
 		void render(sf::RenderWindow* window, sf::Vector2f position, float tileSize);
 
+		bool dead;
 	private:
 		bool instant;
-		bool dead;
 		// Performs the next move in the list this is storing
 		// return attack (if any)
 		int performSingleMove();
