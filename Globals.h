@@ -14,7 +14,7 @@ namespace ts {
 		float attackEffeciency;   // attack / lines cleared
 		float clearWithoutAttack; // how bad it is to clear without attack
 	} static mainFactors = {
-		-50.f, -5.f, -3.f, -100.f, -30.f, -10.f, -2.f, 20.f, 100.f, -40.f  // main with lookaheads
+		-50.f, -5.f, -3.f, -10.f, -30.f, -10.f, -2.f, 20.f, 100.f, -40.f  // main with lookaheads
 		//-25.f, -10.f, -3.f, -30.f, -30.f, -10.f, -5.f, 20.f, 10.f, -20.f, -30.f, -20.f  // downstacking with lookaheads
 		//-30, -20, -4, -5, -20.f, -10, -2, 0, 0, 0 // no lookaheads
 	};

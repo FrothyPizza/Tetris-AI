@@ -91,6 +91,8 @@ void Application::update() {
 	//}
 	//ts::outputFactors(tetrisAI.factors);
 
+	//if (tetrisAI.dead) tetrisAI.reset();
+
 	if (!ts::Globals::TURN_BASED) { // if it isn't turn based, go on a fixed timer 
 		if (AIdelay.getElapsedTime().asMilliseconds() >= ts::Globals::AI_MOVE_DELAY_MS) {
 

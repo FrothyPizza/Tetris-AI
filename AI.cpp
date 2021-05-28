@@ -233,18 +233,119 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 
 // find the percent completion of a shape
 // i.e. the T spin shape could be
-// A A O # O A A
-// L 1 # # # 1 R
-// L 1 1 # 1 1 R
+// A O # O A
+// A # # # A
+// 1 1 # 1 1
 // 
 // where # is empty, 
 // 1 is a block,
-// A means empty or a block,
+// A means empty or a block but are biased toward being a block,
 // L means full all the way down to the left, R for the right,
 // O can be used twice; it means one or the other, but not both, and not neither (xor)
 //
 // If any of the squares that should be empty are full, return 0 percent completion
-float shapePercentCompletion(std::vector<std::vector<int>>& shape) {
+float shapePercentCompletion(const ts::GameState& gameState, const std::vector<std::vector<char>>& shape, std::vector<ts::Point>& holePositions) {
+
+	if (holePositions.size() == 0) return 0;
+
+	// since 0,0 is in top left, this is kinda confusing
+	int furthestDownY = 1;
+	int furthestUpY = ts::HEIGHT-2;
+	for (auto& h : holePositions) {
+		if (h.y > furthestDownY) furthestDownY = h.y;
+		if (h.y < furthestUpY) furthestUpY = h.y;
+	}
+
+
+	int filterLength{ (int)shape.size() };
+	int filterHeight{ (int)shape[0].size() };
+
+	// find all of the NECESSARY relative positions of the slide
+	std::vector<ts::Point> emptyPositions; emptyPositions.reserve(6);
+	std::vector<ts::Point> blockPositions; emptyPositions.reserve(6);
+	std::vector<ts::Point> eitherPositions; eitherPositions.reserve(6);
+	std::vector<ts::Point> xorPositions; xorPositions.reserve(6);
+
+
+	for (size_t i = 0; i < shape.size(); ++i)
+		for (size_t j = 0; j < shape[i].size(); ++j) {
+			if (shape[i][j] == '#') {
+				emptyPositions.push_back({ (int)j, (int)i });
+			}
+			if (shape[i][j] == '1')
+				blockPositions.push_back({ (int)j, (int)i });
+			if (shape[i][j] == 'A')
+				eitherPositions.push_back({ (int)j, (int)i });
+			if (shape[i][j] == 'O')
+				xorPositions.push_back({ (int)j, (int)i });
+		}
+
+	int totalEithers = eitherPositions.size();
+	int correctEithers = 0;
+	ts::Point goodPosition{};
+	bool foundPosition{ false };
+	
+	for (int x = -1; x < ts::WIDTH; ++x) {
+		for (int y = furthestUpY-3; y < furthestDownY+3; ++y) {
+		//for (int y = 0; y < ts::HEIGHT+1; ++y) {
+			// if any of the necessary empty positions are full, then move on b/c this is bad
+			for (auto& empty : emptyPositions)
+				if (gameState.matrix[x + empty.x][y + empty.y] != -1)
+					goto NEXT_POS;
+			// if any of the necessary block positions are empty, then move on b/c this is bad
+			for (auto& block : blockPositions)
+				if (x + block.x >= 0 && x + block.x < ts::WIDTH) // out of bounds counts as it being a block
+					if (gameState.matrix[x + block.x][y + block.y] == -1)
+						goto NEXT_POS;
+			for (auto& either : eitherPositions)
+				if (x + either.x >= 0 && x + either.x < ts::WIDTH) // out of bounds counts as it being a block
+					if (gameState.matrix[x + either.x][y + either.y] != -1) ++correctEithers; // if it is a block, then increase the number of correct eithers
+			
+			foundPosition = true;
+			goodPosition.x = x;
+			goodPosition.y = y;
+			//std::cout << goodPosition.x << " " << goodPosition.y << '\n';
+		NEXT_POS:;
+		}
+	}
+
+	//std::vector<ts::Point> holesInLineWithShape{};
+	int holesInLine = 0;
+	for (size_t i = 0; i < holePositions.size(); ++i) {
+		for (int h = goodPosition.x; h < goodPosition.x + filterHeight; ++h)
+			if (holePositions[i].y == h && holePositions[i].x > goodPosition.x && holePositions[i].x < goodPosition.x + filterLength)
+				//holesInLineWithShape.push_back(holePositions[i]);
+				++holesInLine;
+	}
+
+	totalEithers += holesInLine * 5;
+
+
+	for (int x = goodPosition.x; x >= 0; --x) {
+		for (int y = 1; y < filterHeight; ++y) {
+			++totalEithers;
+			if (gameState.matrix[x][y] != -1) ++correctEithers;
+		}
+	}
+
+	for (int x = goodPosition.x + filterLength; x < ts::WIDTH; ++x) {
+		for (int y = 1; y < filterHeight; ++y) {
+			++totalEithers;
+			if (gameState.matrix[x][y] != -1) ++correctEithers;
+		}
+	}
+
+	bool firstXOR = (gameState.matrix[xorPositions[0].x + goodPosition.x][xorPositions[0].y + goodPosition.y] != -1);
+	bool secondXOR = (gameState.matrix[xorPositions[1].x + goodPosition.x][xorPositions[1].y + goodPosition.y] != -1);
+	if (firstXOR && secondXOR) return 0;
+	if (firstXOR || secondXOR) // having an overhang is very good, so increase the return by a lot
+		correctEithers += 3;
+	if (!(firstXOR && secondXOR))
+		totalEithers += 1;
+
+
+	
+	if(foundPosition) return (float)correctEithers / totalEithers;
 	return 0.f;
 }
 
@@ -259,16 +360,19 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 
 
 	//find holes
+	std::vector<Point> holePositions;
+	holePositions.reserve(10);
 	int holeCount{ 0 };
 	int coverdHoleCount{ 0 };
 	for (int i = 0; i < WIDTH; ++i) {
 		for (int j = 0; j < HEIGHT - 1; ++j) {
 			if (gameState.matrix[i][j] >= 0 && gameState.matrix[i][j + 1] == -1) {
 				holeCount++;
-				// punish deep holes but only up to 3 deep
-				for (int c = 0; c < 3; ++c) {
+				// punish long holes but only up to 4 deep
+				for (int c = 0; c < 4; ++c) {
 					if (gameState.matrix[i][j + c] == -1 && gameState.matrix[i][j + c - 1] == -1) {
 						++holeCount;
+						holePositions.push_back({ (int)i, (int)j });
 					}
 				}
 				// blocks above a hole
@@ -353,7 +457,12 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 	// 0  1  0  1
 	// 1  0  1  0
 
-
+	const static std::vector<std::vector<char>> Tshape{
+	{'A', 'O', '#', 'O', 'A'},
+	{'A', '#', '#', '#', 'A'},
+	{'1', '1', '#', '1', '1'}
+	};
+	score += shapePercentCompletion(gameState, Tshape, holePositions) * 1000;
 
 
 	return score;
