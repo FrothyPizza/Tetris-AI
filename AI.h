@@ -32,6 +32,7 @@ namespace ts {
 
 
 
+
 	float evaluate(const GameState& gameState, AIFactor& AIfactor);
 	float evaluateAttackScore(AIFactor& AIfactor, int attack, int clear);
 
@@ -43,6 +44,9 @@ namespace ts {
 	};
 	// returns a vector of MovementLists with every move
 	std::vector<std::vector<int>> getAllMoves(GameState& gameState, int mino);
+
+
+
 
 	// returns the shortest possible route to an end position
 	// if no path is found within maxMoves amount of moves, return a vector with just -1 in it

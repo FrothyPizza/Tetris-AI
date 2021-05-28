@@ -11,6 +11,7 @@ PlayerTetrisGame::PlayerTetrisGame() : gameState{}, curMino{ NULL }, rect{}  {
 	curMino.setTetromino(nextList.front());
 	nextList.erase(nextList.begin());
 
+
 }
 
 void PlayerTetrisGame::render(sf::RenderWindow* window, sf::Vector2f position, float tileSize) {
@@ -65,23 +66,22 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 		curMino.setTetromino(nextList.front());
 		nextList.erase(nextList.begin());
 		if (nextList.size() < 14) ts::pushOntoNextlist(nextList);
-		int clear = gameState.clearLines();
 		//piecesPlaced++;
-		int tSpin = oldState.isTSpin(oldMino);
 
+		int clear = gameState.lastPlacementClear();
 		if (clear <= 0) gameState.placeGarbage();
 
-		int attack = gameState.getAttack(tSpin, mino, clear);
+		int attack = gameState.lastPlacementAttack();
 
-		// handle back to back;
-		if (clear == 4 || tSpin != gameState.NO_TSPIN && clear > 0) {
-			gameState.b2b++;
-		}
-		else {
-			if (clear > 0) gameState.b2b = 0;
-		}
+		//// handle back to back
+		//if (clear == 4 || gameState.getLastTSpin() != gameState.NO_TSPIN && clear > 0) {
+		//	gameState.b2b++;
+		//}
+		//else {
+		//	if (clear > 0) gameState.b2b = 0;
+		//}
 
-		if (clear == 0) attack = 0;
+		//if (clear == 0) attack = 0;
 		return attack;
 	}
 

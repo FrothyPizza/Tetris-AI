@@ -51,9 +51,6 @@ namespace ts {
 		// moves tetromino all the way down and pastes it to the matrix
 		int  hardDrop(Tetromino& mino);
 
-		// returns lines cleared
-		// must manually call
-		int clearLines();
 
 
 		void hardDropWithoutPaste(Tetromino& mino);
@@ -83,8 +80,7 @@ namespace ts {
 		// resets the matrix to all -1s
 		void resetMatrix();
 
-		// returns the attack
-		int getAttack(int wasTSpin, int minoIndex, int cleared);
+
 
 		enum tSpinTypes {
 			NO_TSPIN, // not a tspin
@@ -92,12 +88,29 @@ namespace ts {
 			TSPIN
 		};
 		
-		// returns if it was a tspin based off of if the last move was a rotation or kick and the position of the mino
-		int isTSpin(Tetromino& mino);
+
 
 		friend bool operator== (const GameState& state1, const GameState& state2);
 
+		int lastPlacementAttack();
+		int lastPlacementClear();
+		int getLastTSpin() { return lastTSpin; }
+
 	private:
+		// returns the attack
+		int getAttack(int wasTSpin, int minoIndex, int cleared);
+
+		// returns lines cleared
+		// must manually call
+		int clearLines();
+
+		// returns if it was a tspin based off of if the last move was a rotation or kick and the position of the mino
+		int isTSpin(Tetromino& mino);
+
+		int lastAttack{ 0 };
+		int lastClear{ 0 };
+		int lastTSpin{ NO_TSPIN };
+
 		void pasteToMatrix(const Tetromino& mino);
 
 		bool wallKick(Tetromino& mino, int dir);

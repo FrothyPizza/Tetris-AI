@@ -9,19 +9,20 @@
 
 // this runs a genetic algorithm to find the best ai factors
 // it runs until program is terminated, stdouting the best ai factors after each generation
+// currently not functional
 class Population {
 public:
 
 	
 
-	Population(int popSize = 30, float mutationRate = 0.1f);
+	Population(int popSize = 100);
 	void run();
 
 	ts::AIFactor bestFactorSoFar();
 
 private:
 	int populationSize;
-	int movesPerGeneration{ 1000 };
+	int movesPerGeneration{ 500 };
 	int movesSoFar{ 0 };
 
 	std::vector<ts::TetrisAI> population;

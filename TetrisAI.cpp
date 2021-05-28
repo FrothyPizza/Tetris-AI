@@ -27,6 +27,7 @@ namespace ts {
 		//gameState.canHold = true;
 
 
+
 		// Potential t spin setup for testing
 
 		//for (int j = 1; j <= 2; ++j) {
@@ -58,7 +59,7 @@ namespace ts {
 	}
 
 	int TetrisAI::doNextMove() {
-		if (isDead()) return 0;
+		//if (isDead()) return 0;
 		if(!Globals::HOLDENABLED) gameState.canHold = false; ///////////////////////////////////////////////////////////////////////////
 
 		if (dead) {
@@ -93,27 +94,15 @@ namespace ts {
 		// , otherwise, just execute the move
 		if (currentMove.at(0) == MOVE_HD) {
 			int mino = curMino.mino;
-			Tetromino oldMino{ curMino };
-			GameState oldState{ gameState };
 
 			int clear = executeMove(gameState, curMino, currentMove, 0, nextList);
-			int tSpin = oldState.isTSpin(oldMino);
+			int attack = gameState.lastPlacementAttack();
 
-			int attack = gameState.getAttack(tSpin, mino, clear);
-
-			// handle back to back;
-			if (clear == 4 || tSpin != gameState.NO_TSPIN && clear > 0) {
-				gameState.b2b++;
-			}
-			else {
-				if (clear > 0) gameState.b2b = 0;
-			}
 
 			piecesPlaced++;
 			totalAttack += attack;
 			thisMoveAttack = attack;
 
-			if (clear == 0) thisMoveAttack = 0;
 
 			if (clear <= 0) gameState.placeGarbage();
 			//std::cout << "APP: " << (float)totalAttack / (float)piecesPlaced << attack << std::endl;
@@ -132,7 +121,6 @@ namespace ts {
 			if (gameState.matrixContains(curMino)) dead = true; // check to see if it dies
 			nextList.erase(nextList.begin());
 			if (nextList.size() < 14) pushOntoNextlist(nextList);
-			gameState.clearLines();
 		}
 
 		return thisMoveAttack;
@@ -141,12 +129,11 @@ namespace ts {
 	int TetrisAI::completelyPerformMove() {
 		generateNextMove();
 
-		GameState oldState{ gameState };
 		int cleared = fullyPerformMove(gameState, curMino, currentMove, nextList);
-		int Tspin = oldState.isTSpin(curMino);
+		int Tspin = gameState.getLastTSpin();
 		int mino = curMino.mino;
 
-		int attack = gameState.getAttack(Tspin, mino, cleared);
+		int attack = gameState.lastPlacementAttack();
 
 		// handle back to back;
 		if (cleared == 4 || Tspin != gameState.NO_TSPIN && cleared > 0) {
@@ -162,7 +149,6 @@ namespace ts {
 			curMino.setTetromino(nextList.front());
 			if (gameState.matrixContains(curMino)) dead = true;
 			nextList.erase(nextList.begin());
-			gameState.clearLines();
 
 			totalAttack += attack;
 			piecesPlaced++;

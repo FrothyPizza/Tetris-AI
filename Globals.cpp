@@ -13,7 +13,6 @@ bool ts::Globals::HOLDENABLED{ true };
 bool ts::Globals::AI_USE_UNIQUE_MOVES{ false };
 bool ts::Globals::AI_FULLY_PERFORM_MOVE{ false };
 bool ts::Globals::TURN_BASED{ false };
-bool ts::Globals::GO_FOR_MOSTLY_TETRISES{ true };
 
 void ts::Globals::InitVars() {
 
@@ -41,7 +40,6 @@ void ts::Globals::InitVars() {
             if (name == "hold_enabled") HOLDENABLED = std::stoi(value);
             if (name == "use_unique_moves") AI_USE_UNIQUE_MOVES = std::stoi(value);
             if (name == "fully_perform_move") AI_FULLY_PERFORM_MOVE = std::stoi(value);
-            if (name == "go_for_mostly_tetrises") GO_FOR_MOSTLY_TETRISES = std::stoi(value);
         }
 
     }
@@ -63,9 +61,7 @@ void ts::outputFactors(AIFactor& factor) {
 		<< factor.attack << ", "
 		<< factor.attackEffeciency << ", "
 		<< factor.averageHeight << ", "
-		<< factor.blockInRightWell << ", "
 		<< factor.clearWithoutAttack << ", "
-		<< factor.didntClearTetris << ", "
 		<< factor.heightVariance << ", "
 		<< factor.hole << ", "
 		<< factor.holeCovered << ", "

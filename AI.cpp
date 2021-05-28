@@ -5,6 +5,7 @@
 
 std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, int minoIndex, std::vector<int>& nextList, float thisPathAttackScore, int depth) {
 	
+
 	std::vector<int> bestMove{};
 	float bestScore{ -100000.f };
 	{
@@ -19,26 +20,23 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 
 
 		for (size_t i = 0; i < allMoves.size(); ++i) {
-			GameState oldState{ currentState };
-			GameState newState{ currentState };
+			allNewStates.push_back(GameState{ currentState });
+	
+			//GameState newState{ currentState };
 			Tetromino mino{ minoIndex };
 			std::vector<int> newNext{ nextList };
 
-			int clear = fullyPerformMove(newState, mino, allMoves.at(i), newNext);
-			int Tspin = oldState.isTSpin(mino);
-			int attack = newState.getAttack(Tspin, minoIndex, clear);
-			float evaluation = evaluate(newState, AIfactor);
-			float atkScore = evaluateAttackScore(AIfactor, attack, clear);
+			fullyPerformMove(allNewStates.at(i), mino, allMoves.at(i), newNext);
+			float evaluation = evaluate(allNewStates.at(i), AIfactor);
+			float atkScore = evaluateAttackScore(AIfactor, allNewStates.at(i).lastPlacementAttack(), allNewStates.at(i).lastPlacementClear());
 			evaluation += atkScore;
 
 			attackEvaluations.push_back(atkScore);
 			evaluations.push_back(evaluation);
-			allNewStates.push_back(newState);
 		}
 
 
 		if (depth == 0) { // if depth is 0 then it doesnt have to go through the trouble of sorting the evaluations and looking ahead
-
 			for (size_t i = 0; i < evaluations.size(); ++i) {
 				if (evaluations.at(i) + attackEvaluations.at(i) > bestScore) {
 					bestMove = allMoves.at(i);
@@ -63,9 +61,9 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 					for (size_t c = 0; c < bestIndexes.size(); ++c)
 						if (j == bestIndexes.at(c)) // if the index being considered has already been added, don't add it
 							bestIndexesHasJ = true;
-					for (size_t c = 0; c < bestIndexes.size(); ++c)
-						if (allNewStates.at(j) == allNewStates.at(bestIndexes.at(c))) // if the gamestate is a duplicate, don't consider it
-							bestIndexesHasJ = true;
+					//for (size_t c = 0; c < bestIndexes.size(); ++c)
+					//	if (allNewStates.at(j) == allNewStates.at(bestIndexes.at(c))) // if the gamestate is a duplicate, don't consider it
+					//		bestIndexesHasJ = true;
 					if (evaluations.at(j) > bestEvaluation && bestIndexesHasJ == false) {
 						bestEvaluation = evaluations.at(j);
 						bestIndex = j;
@@ -81,12 +79,10 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 				Tetromino thisMino{ nextList.at(0) };
 				std::vector<int> newNext{ nextList.begin(), nextList.end() };
 				std::vector<int> move = findBestMove(AIfactor, thisState, nextList.at(0), newNext, thisPathAttackScore + attackEvaluations.at(bestIndexes.at(i)), depth - 1);
-				int clear = fullyPerformMove(thisState, thisMino, move, newNext);
-				int isTspin = thisState.isTSpin(thisMino);
-				int attack = thisState.getAttack(isTspin, thisMino.mino, clear);
+				fullyPerformMove(thisState, thisMino, move, newNext);
 
+				float evaluation = evaluate(thisState, AIfactor) + evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear());
 
-				float evaluation = evaluate(thisState, AIfactor) + evaluateAttackScore(AIfactor, attack, clear);
 				if (evaluation > bestScore) {
 					bestScore = evaluation;
 					bestMove = allMoves.at(bestIndexes.at(i));
@@ -111,21 +107,17 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 		attackEvaluations.reserve(allMovesWithHold.size());
 
 		for (size_t i = 0; i < allMovesWithHold.size(); ++i) {
-			GameState oldState{ holdState };
-			GameState newState{ holdState };
+			allNewStates.push_back(holdState);
 			Tetromino mino{ holdMino.mino };
 			std::vector<int> newNext{ holdNext };
 
-			int clear = fullyPerformMove(newState, mino, allMovesWithHold.at(i), newNext);
-			int Tspin = oldState.isTSpin(mino);
-			int attack = newState.getAttack(Tspin, minoIndex, clear);
-			float evaluation = evaluate(newState, AIfactor);
-			float atkScore = evaluateAttackScore(AIfactor, attack, clear);
+			fullyPerformMove(allNewStates.at(i), mino, allMovesWithHold.at(i), newNext);
+			float evaluation = evaluate(allNewStates.at(i), AIfactor);
+			float atkScore = evaluateAttackScore(AIfactor, allNewStates.at(i).lastPlacementAttack(), allNewStates.at(i).lastPlacementClear());
 			evaluation += atkScore;
 
 			attackEvaluations.push_back(atkScore);
 			evaluations.push_back(evaluation);
-			allNewStates.push_back(newState);
 		}
 
 
@@ -155,9 +147,9 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 					for (size_t c = 0; c < bestIndexes.size(); ++c)
 						if (j == bestIndexes.at(c)) // if the index being considered has already been added, don't add it
 							bestIndexesHasJ = true;
-					for (size_t c = 0; c < bestIndexes.size(); ++c)
-						if (allNewStates.at(j) == allNewStates.at(bestIndexes.at(c))) // if the gamestate is a duplicate, don't consider it
-							bestIndexesHasJ = true;
+					//for (size_t c = 0; c < bestIndexes.size(); ++c)
+					//	if (allNewStates.at(j) == allNewStates.at(bestIndexes.at(c))) // if the gamestate is a duplicate, don't consider it
+					//		bestIndexesHasJ = true;
 					if (evaluations.at(j) > bestEvaluation && bestIndexesHasJ == false) {
 						bestEvaluation = evaluations.at(j);
 						bestIndex = j;
@@ -173,10 +165,9 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 				Tetromino thisMino{ holdNext.at(0) };
 				std::vector<int> newNext{ holdNext.begin(), holdNext.end() };
 				std::vector<int> move = findBestMove(AIfactor, thisState, holdNext.at(0), newNext, thisPathAttackScore + attackEvaluations.at(bestIndexes.at(i)), depth - 1);
-				int clear = fullyPerformMove(thisState, thisMino, move, newNext);
-				int isTspin = thisState.isTSpin(thisMino);
-				int attack = thisState.getAttack(isTspin, thisMino.mino, clear);
-				float evaluation = evaluate(thisState, AIfactor);
+				fullyPerformMove(thisState, thisMino, move, newNext);
+
+				float evaluation = evaluate(thisState, AIfactor) + evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear());;
 				if (evaluation > bestScore) {
 					bestScore = evaluation;
 					//bestMove = allMovesWithHold.at(bestIndexes.at(i));
@@ -194,54 +185,78 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 	
 }
 
-// This doens't work
-std::pair<std::vector<int>, float> ts::getAIMove(AIFactor& AIfactor, GameState& currentState, int minoIndex, std::vector<int>& nextList, float thisPathTotalAttackScore, int depth) {
+//// This doens't work
+//std::pair<std::vector<int>, float> ts::getAIMove(AIFactor& AIfactor, GameState& currentState, int minoIndex, std::vector<int>& nextList, float thisPathTotalAttackScore, int depth) {
+//
+//	if (depth == 0) {
+//		return std::pair<std::vector<int>, float>{std::vector<int>{}, evaluate(currentState, AIfactor) + thisPathTotalAttackScore};
+//	}
+//
+//	std::pair<std::vector<int>, float> bestMove{};
+//
+//
+//	// no hold
+//	{
+//
+//		// generate all possible moves
+//		std::vector<std::vector<int>> allMoves{ getAllMoves(currentState, minoIndex) };
+//
+//		// for each move, execute it and lookahead
+//		for (size_t i = 0; i < allMoves.size(); ++i) {
+//			GameState oldState{ currentState };
+//			GameState newState{ currentState };
+//			Tetromino mino{ minoIndex };
+//			std::vector<int> newNext{ nextList };
+//
+//			int clear = fullyPerformMove(newState, mino, allMoves.at(i), newNext);
+//			int Tspin = oldState.isTSpin(mino);
+//			int attack = newState.getAttack(Tspin, minoIndex, clear);
+//			float evaluation = evaluate(newState, AIfactor);
+//			float atkScore = evaluateAttackScore(AIfactor, attack, clear);
+//			
+//			float overallScore = getAIMove(AIfactor, newState, nextList.at(0), newNext, atkScore + thisPathTotalAttackScore, depth - 1).second;
+//
+//			if (overallScore > bestMove.second) {
+//				bestMove = std::pair<std::vector<int>, float>{ allMoves.at(i), overallScore };
+//			}
+//		}
+//
+//
+//	}
+//
+//
+//	return bestMove;
+//}
 
-	if (depth == 0) {
-		return std::pair<std::vector<int>, float>{std::vector<int>{}, evaluate(currentState, AIfactor) + thisPathTotalAttackScore};
-	}
-
-	std::pair<std::vector<int>, float> bestMove{};
 
 
-	// no hold
-	{
 
-		// generate all possible moves
-		std::vector<std::vector<int>> allMoves{ getAllMoves(currentState, minoIndex) };
-
-		// for each move, execute it and lookahead
-		for (size_t i = 0; i < allMoves.size(); ++i) {
-			GameState oldState{ currentState };
-			GameState newState{ currentState };
-			Tetromino mino{ minoIndex };
-			std::vector<int> newNext{ nextList };
-
-			int clear = fullyPerformMove(newState, mino, allMoves.at(i), newNext);
-			int Tspin = oldState.isTSpin(mino);
-			int attack = newState.getAttack(Tspin, minoIndex, clear);
-			float evaluation = evaluate(newState, AIfactor);
-			float atkScore = evaluateAttackScore(AIfactor, attack, clear);
-			
-			float overallScore = getAIMove(AIfactor, newState, nextList.at(0), newNext, atkScore + thisPathTotalAttackScore, depth - 1).second;
-
-			if (overallScore > bestMove.second) {
-				bestMove = std::pair<std::vector<int>, float>{ allMoves.at(i), overallScore };
-			}
-		}
-
-
-	}
-
-
-	return bestMove;
+// find the percent completion of a shape
+// i.e. the T spin shape could be
+// A A O # O A A
+// L 1 # # # 1 R
+// L 1 1 # 1 1 R
+// 
+// where # is empty, 
+// 1 is a block,
+// A means empty or a block,
+// L means full all the way down to the left, R for the right,
+// O can be used twice; it means one or the other, but not both, and not neither (xor)
+//
+// If any of the squares that should be empty are full, return 0 percent completion
+float shapePercentCompletion(std::vector<std::vector<int>>& shape) {
+	return 0.f;
 }
-
-
 
 
 float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 	float score{ 0 };
+
+	//// if dead
+	//for (int i = 3; i < 6; ++i)
+	//	for (int j = 4; j < 6; ++j)
+	//		if (gameState.matrix[i][j] >= 0) return -1000;
+
 
 	//find holes
 	int holeCount{ 0 };
@@ -328,9 +343,6 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 		int color = (columnHeights.at(i) % 2) ^ (i % 2);
 		if (color == 1) ++parity;
 		else --parity;
-
-		//if (columnHeights.at(i) % 2 == 0) parity++; // if it's black, increment it
-		//else parity--; // if it's white, decrement it
 	}
 	parity /= 2;
 	parity = abs(parity);
@@ -341,16 +353,14 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 	// 0  1  0  1
 	// 1  0  1  0
 
-	if (Globals::GO_FOR_MOSTLY_TETRISES) {
-		int blocksInWell{ 0 };
-		for (int i = 0; i < HEIGHT; ++i)
-			if (gameState.matrix[0][i] >= 0) ++blocksInWell;
-		score += blocksInWell * AIfactor.blockInRightWell;
-	}
+
 
 
 	return score;
 }
+
+
+
 
 float ts::evaluateAttackScore(AIFactor& AIfactor, int attack, int clear) {
 	float score{ 0 };
@@ -371,7 +381,6 @@ float ts::evaluateAttackScore(AIFactor& AIfactor, int attack, int clear) {
 		score += atkeff * AIfactor.attackEffeciency;
 	}
 
-	if (clear > 0 && clear != 4) score += AIfactor.didntClearTetris;
 
 
 	//return 0; ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -515,8 +524,6 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 	//// Find unique positions /////////////////////////////////////////////////////////////
 	// (doesn't work)
 	if (Globals::AI_USE_UNIQUE_MOVES) {
-
-
 		Tetromino m{ mino };
 
 		std::vector<int> fakeNext{ 0 }; // fake next list so the fullyPerformMove call is valid
@@ -542,6 +549,7 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 			// add this endpostion to the vector
 			endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
 
+
 			if (m.y < highestY) highestY = m.y;
 			if (m.y > lowestY) lowestY = m.y;
 		}
@@ -554,6 +562,7 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 				m.x = i;
 				m.y = j;
 
+				if (gameState.matrixContains(m)) continue;
 				gameState.hardDropWithoutPaste(m);
 
 				bool isNew{ true };
@@ -574,105 +583,18 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 				
 			}
 		}
+		//std::cout << "\nUnique End Positions " << newEndPositions.size() << ", Non unique: " << endPositions.size();
 
-		//std::cout << "\nUnique End Positions" << newEndPositions.size();
 		for (size_t i = 0; i < newEndPositions.size(); ++i) {
 			//allMoves.push_back(pathfindToEndPosition(gameState, mino, newEndPositions.at(i), 5));
 		}
 
 
-
-
-		//Tetromino m{ mino };
-
-		//std::vector<int> fakeNext{ 0 }; // fake next list so the fullyPerformMove call is valid
-		//								// this is kinda hackey, but whatever
-
-		//// endPositions is necessary so that minimal moves need to be brute forced
-		//std::vector<EndPosition> endPositions;
-		//endPositions.reserve(skyMoves.size());
-
-		//// add hard drop without pasting to the moves
-		//// and then perfrom the move so that the end position each move is known
-		//for (size_t i = 0; i < skyMoves.size(); ++i) {
-		//	skyMoves.at(i).push_back(MOVE_DD);
-
-		//	// reset the mino
-		//	m.setTetromino(mino);
-
-		//	// perform the move
-		//	fullyPerformMove(gameState, m, skyMoves.at(i), fakeNext);
-
-		//	// add this endpostion to the vector
-		//	endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
-
-
-		//}
-
-
-
-		//std::vector<std::vector<int>> otherMoves{};
-		//otherMoves.reserve(skyMoves.size() + 10);
-
-		//int startIndex{ 0 };
-		//if (mino == MINO_I) startIndex = 7;
-		//if (mino == MINO_J || mino == MINO_L || mino == MINO_T) startIndex = 16;
-		//if (mino == MINO_S || mino == MINO_Z) startIndex = 8;
-
-		//// find most other moves by adding soft drop and testing rotations
-		//if (mino != MINO_O) {
-		//	// only check the upright positions
-		//	for (size_t i = startIndex; i < skyMoves.size(); ++i) {
-		//		std::vector<int> move = skyMoves.at(i);
-		//		move.reserve(move.capacity() + 2);
-
-		//		move.push_back(MOVE_DD);
-		//		move.push_back(ROT_CW);
-		//		otherMoves.push_back(move);
-
-		//		move.pop_back(); // remove last move
-		//		move.push_back(ROT_CCW);
-		//		otherMoves.push_back(move);
-
-		//	}
-		//}
-
-
-		////std::vector<endMino> otherPositions;
-		////otherPositions.reserve(otherMoves.size());
-		//for (size_t i = 0; i < otherMoves.size(); ++i) {
-		//	// add move dd to the move to find the correct ending position
-		//	otherMoves.at(i).push_back(MOVE_DD);
-
-		//	// reset the mino
-		//	m.setTetromino(mino);
-
-		//	// perform the move to get the proper ending position for the tetromino
-		//	fullyPerformMove(gameState, m, otherMoves.at(i), fakeNext);
-
-		//	bool isNew{ true };
-		//	for (size_t j = 0; j < endPositions.size(); ++j) { // for each already established endposition
-		//		if (endPositions.at(j).x == m.x && // if that endposition is the same as this one
-		//			endPositions.at(j).y == m.y &&
-		//			endPositions.at(j).rot == m.rotation) {
-		//			isNew = false; // then don't add it
-		//			break; // and break
-		//		}
-		//	}
-
-		//	if (isNew) {
-		//		endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
-
-		//		// change the last move of this move from movedd to movehd
-		//		otherMoves.at(i).at(otherMoves.at(i).size() - 1) = MOVE_HD;
-
-		//		// add it to allMoves
-		//		allMoves.push_back(otherMoves.at(i));
-
-		//	}
-
-		//}
 	}
+
+
+
+
 
 	// Add sky moves to allMoves ////////////////////////////////////////////////////////////////////
 	for (size_t i = 0; i < skyMoves.size(); ++i) {
@@ -689,6 +611,8 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 
 	return allMoves;
 }
+
+
 
 // WIP
 std::vector<int> ts::pathfindToEndPosition(GameState& gameState, int mino, EndPosition& position, int maxMoves) {
@@ -743,7 +667,7 @@ int ts::executeMove(GameState& gameState, Tetromino& mino, const std::vector<int
 		break;
 	case MOVE_HD:
 		gameState.hardDrop(mino);
-		return gameState.clearLines();
+		return gameState.lastPlacementAttack();
 		break;
 
 	}

@@ -19,10 +19,13 @@ void Application::initWindow() {
 }
 
 Application::Application() : playerGame{},
-	tetrisAI{ ts::Globals::AI_FULLY_PERFORM_MOVE },
-	population{} {
+	tetrisAI{ ts::Globals::AI_FULLY_PERFORM_MOVE }
+	//,population{} 
+{
 	initVars();
 	initWindow();
+
+
 
 
 }
@@ -79,13 +82,13 @@ void Application::pollEvents() {
 void Application::update() {
 	pollEvents();
 
-	population.run();
+	//population.run();
 
-	tetrisAI.factors = population.bestFactorSoFar();
-	if (tetrisAI.isDead()) {
-		tetrisAI.reset();
-		tetrisAI.dead = false;
-	}
+	//tetrisAI.factors = population.bestFactorSoFar();
+	//if (tetrisAI.isDead()) {
+	//	tetrisAI.reset();
+	//	tetrisAI.dead = false;
+	//}
 	//ts::outputFactors(tetrisAI.factors);
 
 	if (!ts::Globals::TURN_BASED) { // if it isn't turn based, go on a fixed timer 

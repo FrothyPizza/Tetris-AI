@@ -104,7 +104,19 @@ namespace ts {
 				// if the hard drop moved the tetromino, the last move wasn't a kick
 				if (i != 0) lastMoveWasKick = false;
 				mino.y--;
+				lastTSpin = isTSpin(mino);
 				pasteToMatrix(mino);
+
+				lastClear = clearLines();
+				lastAttack = getAttack(lastTSpin, mino.mino, lastClear);
+
+				// handle back to back
+				if (lastClear == 4 || lastTSpin != NO_TSPIN && lastClear > 0)
+					b2b++;
+				else
+					if (lastClear > 0) b2b = 0;
+
+				if (lastClear == 0) lastAttack = 0;
 				return i;
 				break;
 			}
@@ -118,10 +130,8 @@ namespace ts {
 		int lines{ 0 };
 		for (int i = 0; i < HEIGHT; ++i) {
 			c = 0;
-			//std::cout << std::endl;
 			for (int j = 0; j < WIDTH; ++j) {
 				if (matrix[j][i] > -1) c++;
-				//std::cout << grid[i][j] << " ";
 			}
 
 			if (c == WIDTH) {
@@ -135,7 +145,6 @@ namespace ts {
 					}
 				}
 			}
-			//std::cout << c << " ";
 		}
 		if (lines > 0) combo++;
 		else combo = 0;
@@ -154,6 +163,14 @@ namespace ts {
 		}
 	}
 
+
+	int GameState::lastPlacementAttack() {
+		return lastAttack;
+	}
+
+	int GameState::lastPlacementClear() {
+		return lastClear;
+	}
 
 	void GameState::pasteToMatrix(const Tetromino& mino) {
 		for (int i = 0; i < 4; ++i) {

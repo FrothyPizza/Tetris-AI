@@ -2,7 +2,7 @@
 
 
 
-Population::Population(int popSize, float mutationRate) : populationSize{ popSize } {
+Population::Population(int popSize) : populationSize{ popSize } {
 
 	population.reserve(popSize);
 	for (int i = 0; i < popSize; ++i)
@@ -64,7 +64,7 @@ void Population::createNewPopulation() {
 	population.clear();
 
 	population.reserve(populationSize);
-	for (size_t i = 0; i < populationSize; ++i) {
+	for (int i = 0; i < populationSize; ++i) {
 		ts::AIFactor mutated = champion;
 		mutate(mutated);
 		population.push_back(ts::TetrisAI{ mutated });
@@ -84,9 +84,7 @@ void Population::mutate(ts::AIFactor& factor) {
 	factor.attack += random();
 	factor.attackEffeciency += random();
 	factor.averageHeight += random();
-	factor.blockInRightWell += random();
 	factor.clearWithoutAttack += random();
-	factor.didntClearTetris += random();
 	factor.heightVariance += random();
 	factor.hole += random();
 	factor.holeCovered += random();
@@ -110,7 +108,5 @@ ts::AIFactor Population::generateRandomFactor() {
 		(float)(rand() % ((int)bound * 2)) - bound,
 		(float)(rand() % ((int)bound * 2)) - bound,
 		(float)(rand() % ((int)bound * 2)) - bound,
-		(float)(rand() % ((int)bound * 2)) - bound,
-		(float)(rand() % ((int)bound * 2)) - bound
 	};
 }

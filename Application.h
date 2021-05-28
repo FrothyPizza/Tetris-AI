@@ -26,7 +26,7 @@ private:
 	ts::TetrisAI tetrisAI;
 	sf::Clock AIdelay{};
 
-	Population population;
+	//Population population;
 
 	
 
