@@ -27,7 +27,6 @@ namespace ts {
 		hold{ -1 },
 		canHold{ true },
 		combo{ 0 },
-		lastMove{ 0 },
 		lastMoveWasKick{ false },
 		totalLinesCleared{ 0 },
 		totalLinesSent{ 0 },
@@ -89,6 +88,7 @@ namespace ts {
 			return false;
 		}
 		else {
+			lastMoveWasRot = false;
 			lastMoveWasKick = false;
 			return true;
 		}
@@ -158,6 +158,7 @@ namespace ts {
 			mino.y++;
 			if (matrixContains(mino)) {
 				mino.y--;
+				if(i > 0) lastMoveWasRot = false;
 				break;
 			}
 		}
@@ -191,14 +192,15 @@ namespace ts {
 			return false;
 		}
 		else {
-			return true;
 			lastMoveWasKick = false;
+			lastMoveWasRot = false;
+			return true;
 		}
 	}
 
 	void GameState::arrX(Tetromino& mino, int x) {
-		for (int i = 0; i < 10; ++i) {
-			moveX(mino, x);
+		for (int i = 0; i < WIDTH; ++i) {
+			if(!moveX(mino, x)) return; // as soon as it fails, stop trying to move it
 		}
 	}
 
@@ -210,7 +212,7 @@ namespace ts {
 
 		Tetromino oldMino{ mino };
 
-		// if it's an i piece rotate differently
+		// if it's an i piece then use the precomputed rotations
 		if (mino.mino == MINO_I) {
 			int rot = mino.rotation;
 
@@ -233,7 +235,7 @@ namespace ts {
 				mino.data[i].y = IrotationData[rot][i].y;
 			}
 		}
-		else {
+		else { // if it isn't an I piece
 			if (dir == 1) {
 				for (int i = 0; i < 4; ++i) {
 					int x = mino.data[i].x; int y = mino.data[i].y;
@@ -263,15 +265,16 @@ namespace ts {
 		}
 
 		bool kickSuccess = false;
-		if (matrixContains(mino)) kickSuccess = wallKick(mino, dir);
-		// if it doesn't work, undo it
-		if (matrixContains(mino) && !kickSuccess) {
+		if (matrixContains(mino)) kickSuccess = wallKick(mino, dir); // if the rotation fails, then attempt a kick
+		else lastMoveWasRot = true; // the direction doesn't matter
+		if (matrixContains(mino) && !kickSuccess) { // if the kick doesn't work, then reset the mino
 			for (int i = 0; i < 4; ++i) {
 				mino.data[i].x = oldMino.data[i].x;
 				mino.data[i].y = oldMino.data[i].y;
 			}
 		}
 		else {
+			lastMoveWasRot = true;
 			if (kickSuccess) lastMoveWasKick = true;
 			if (dir == 2) {
 				if (mino.rotation == 0) mino.rotation = 2;
@@ -287,6 +290,7 @@ namespace ts {
 		}
 	}
 
+	// this doesn't have to be very efficient since the AI seldom uses kicks
 	bool GameState::wallKick(Tetromino& mino, int dir) {
 		int newRotation = mino.rotation;
 
@@ -405,25 +409,19 @@ namespace ts {
 	}
 
 	void GameState::resetMatrix() {
-		for (int i = 0; i < WIDTH; ++i) {
-			for (int j = 0; j < HEIGHT; ++j) {
+		for (int i = 0; i < WIDTH; ++i)
+			for (int j = 0; j < HEIGHT; ++j)
 				matrix[i][j] = -1;
-			}
-		}
+
 	}
 
 
 
 	int GameState::getAttack(int wasTSpin, int minoIndex, int cleared) {
+		if (cleared == 0) return 0;
+
 		int attack = 0;
-		//if (lastMoveWasKick && minoIndex == MINO_T) {
-		//	if (cleared == 1) attack = 1;//attack = 1;
-		//	else attack = cleared * 2;
-		//}
-		//else {
-		//	// if it wasnt a kick, send lines if it cleared 2 or 3
-		//	if (cleared == 2 || cleared == 3) attack = cleared - 1;
-		//}
+
 		if (cleared == 2 || cleared == 3) attack = cleared - 1; // 1 attack for 2 lines, 2 for 3 lines
 
 		if (minoIndex == MINO_T) {
@@ -441,21 +439,21 @@ namespace ts {
 		}
 
 		//if it was a Tetris, attack = 4
-		if (cleared == 4) {
+		if (cleared == 4)
 			attack = 4;
-		}
 
-		if (b2b > 0) attack += 1;
+		if (b2b > 0 && (cleared == 4 || wasTSpin != NO_TSPIN)) attack += 1;
 
 		// add combo
 		if (combo >= 13) attack += 5;
-		else attack += comboTable[this->combo];
+		else attack += comboTable[combo];
 
 		return attack;
 	}
 	// pass in the tetromino where it was before hard drop, and then test it int the matrix before hard drop
 	int GameState::isTSpin(Tetromino& mino) {
-		if (mino.mino != MINO_T) return false;
+		if (mino.mino != MINO_T) return NO_TSPIN;
+		if (!lastMoveWasRot) return NO_TSPIN;
 
 		int cornersFilled = 0;
 		// C T C
@@ -502,8 +500,7 @@ namespace ts {
 		if (cornersFilled >= 3 && mainCellsFilled >= 2) return TSPIN;
 		else if (cornersFilled >= 3) return TSPIN_MINI; // mini t spin doesnt need main cells filled
 		return NO_TSPIN;
-		// if it couldn't move, return true
-		//return true;
+
 	}
 
 

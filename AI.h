@@ -34,7 +34,7 @@ namespace ts {
 
 
 	float evaluate(const GameState& gameState, AIFactor& AIfactor);
-	float evaluateAttackScore(AIFactor& AIfactor, int attack, int clear);
+	float evaluateAttackScore(AIFactor& AIfactor, int attack, int clear, int tSpin);
 
 
 	struct EndPosition {

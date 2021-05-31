@@ -12,26 +12,26 @@ PlayerTetrisGame::PlayerTetrisGame() : gameState{}, curMino{ NULL }, rect{}  {
 	nextList.erase(nextList.begin());
 
 
-	// testing
-	const static std::vector<std::vector<char>> shape{
-	{'A', 'O', '#', 'O', 'A'},
-	{'A', '#', '#', '#', 'A'},
-	{'1', '1', '#', '1', '1'}
-	};
+	//// testing
+	//const static std::vector<std::vector<char>> shape{
+	//{'A', 'O', '#', 'O', 'A'},
+	//{'A', '#', '#', '#', 'A'},
+	//{'1', '1', '#', '1', '1'}
+	//};
 
-	std::vector<ts::Point> emptyPositions; emptyPositions.reserve(6);
-	std::vector<ts::Point> blockPositions; emptyPositions.reserve(6);
-	for (size_t i = 0; i < shape.size(); ++i)
-		for (size_t j = 0; j < shape[i].size(); ++j) {
-			if (shape[i][j] == '#') emptyPositions.push_back({ (int)j, (int)i });
-			if (shape[i][j] == '1') blockPositions.push_back({ (int)j, (int)i });
-		}
+	//std::vector<ts::Point> emptyPositions; emptyPositions.reserve(6);
+	//std::vector<ts::Point> blockPositions; emptyPositions.reserve(6);
+	//for (size_t i = 0; i < shape.size(); ++i)
+	//	for (size_t j = 0; j < shape[i].size(); ++j) {
+	//		if (shape[i][j] == '#') emptyPositions.push_back({ (int)j, (int)i });
+	//		if (shape[i][j] == '1') blockPositions.push_back({ (int)j, (int)i });
+	//	}
 
-	int x = 3; int y = ts::HEIGHT - 3;
-	for (auto& empty : emptyPositions)
-		gameState.matrix[x + empty.x][y + empty.y] = 1;
-	for (auto& block : blockPositions)
-		gameState.matrix[x + block.x][y + block.y] = 2;
+	//int x = 3; int y = ts::HEIGHT - 3;
+	//for (auto& empty : emptyPositions)
+	//	gameState.matrix[x + empty.x][y + empty.y] = 1;
+	//for (auto& block : blockPositions)
+	//	gameState.matrix[x + block.x][y + block.y] = 2;
 
 	//int x = 3; int y = ts::HEIGHT-3;
 	//bool foundAnO{ false };

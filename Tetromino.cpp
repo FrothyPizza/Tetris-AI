@@ -10,9 +10,10 @@ namespace ts {
 		y = YMARGIN - TETROMINO_START_Y;
 		rotation = 0;
 
-		data.reserve(4);
+		//data.reserve(4);
 		for (int i = 0; i < 4; ++i) {
-			data.push_back(tetrominoData[minoIndex][i]);
+			//data.push_back(tetrominoData[minoIndex][i]);
+			data[i] = tetrominoData[minoIndex][i];
 		}
 	}
 

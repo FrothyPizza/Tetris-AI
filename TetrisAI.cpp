@@ -135,13 +135,13 @@ namespace ts {
 
 		int attack = gameState.lastPlacementAttack();
 
-		// handle back to back;
-		if (cleared == 4 || Tspin != gameState.NO_TSPIN && cleared > 0) {
-			gameState.b2b++;
-		}
-		else {
-			if (cleared > 0) gameState.b2b = 0;
-		}
+		//// handle back to back;
+		//if (cleared == 4 || Tspin != gameState.NO_TSPIN && cleared > 0) {
+		//	gameState.b2b++;
+		//}
+		//else {
+		//	if (cleared > 0) gameState.b2b = 0;
+		//}
 
 
 
@@ -164,9 +164,9 @@ namespace ts {
 	}
 
 	void TetrisAI::generateNextMove() {
-		//currentMove = AI::makeAImove(gameState, curMino.tile, nextList, mainFactors, 0);
 		currentMove = findBestMove(factors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS);
-		//currentMove = getAIMove(mainFactors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS).first;
+
+		//currentMove = getAIMove(factors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS).first;
 		//for (int i = 0; i < currentMove.size(); ++i) std::cout << '\n' << currentMove.at(i);
 	}
 

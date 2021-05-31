@@ -28,8 +28,8 @@ namespace ts {
 		// the number of consecutive tspins/tetrisis without any line clears inbetween
 		int b2b;
 
-		// stores what the previous move was before hard drop
-		int lastMove;
+
+		bool lastMoveWasRot{ false };
 		// used to detect if piece placed was a t
 		bool lastMoveWasKick;
 

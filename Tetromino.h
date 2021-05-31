@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
-
+#include <array>
 
 #define TETROMINO_START_Y 0 // starting position for the tetromino, default zero, increase to spawn the tetromino lower
 
@@ -96,6 +96,7 @@ namespace ts {
 	};
 	
 
+
 	struct Tetromino {
 		Tetromino() = delete; // no default constructor
 
@@ -103,7 +104,8 @@ namespace ts {
 
 		void setTetromino(int minoIndex);
 
-		std::vector<Point> data;
+		//std::vector<Point> data;
+		std::array<Point, 4> data;
 		int x, y;
 		int mino;
 		int rotation;
