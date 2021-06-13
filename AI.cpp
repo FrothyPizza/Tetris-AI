@@ -325,7 +325,7 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 
 	// if dead (need to work on this)
 	for (int i = 3; i < 6; ++i)
-		for (int j = 4; j < 6; ++j)
+		for (int j = 3; j < 5; ++j)
 			if (gameState.matrix[i][j] >= 0) return -10000;
 
 
@@ -384,8 +384,8 @@ float ts::evaluate(const GameState& gameState, AIFactor& AIfactor) {
 	averageHeight /= columnHeights.size();
 	score += averageHeight * AIfactor.averageHeight;
 	score += highestHeight * AIfactor.highestHeight;
-	if (averageHeight > 10) score += averageHeight * AIfactor.averageHeight * 2;
-	if (highestHeight > 16) score += highestHeight * AIfactor.highestHeight * 2;
+	if (averageHeight > 10) score += averageHeight * AIfactor.averageHeight;
+	//if (highestHeight > 12) score += highestHeight * AIfactor.highestHeight * 2;
 
 	// Calculate I dependencies and height variance
 	int Idependencies{ 0 };
@@ -487,122 +487,18 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 	// all of the positions in the air before hard drop
 	std::vector<std::vector<int>> skyMoves;
 	skyMoves.reserve(30);
+	
 
+	if (mino == MINO_L || mino == MINO_J || mino == MINO_T)
+		skyMoves = ljtMoves;
+	if (mino == MINO_Z || mino == MINO_S)
+		skyMoves = szMoves;
+	if (mino == MINO_I)
+		skyMoves = iMoves;
+	if (mino == MINO_O)
+		skyMoves = oMoves;
 
-	// no rotation sky positions
-	if (mino == MINO_L || mino == MINO_J || mino == MINO_S || mino == MINO_Z || mino == MINO_T) {
-		skyMoves.push_back(std::vector<int>{MOVE_LL});
-		skyMoves.push_back(std::vector<int>{MOVE_LL, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_L});
-		skyMoves.push_back(std::vector<int>{});
-		skyMoves.push_back(std::vector<int>{MOVE_RR});
-		skyMoves.push_back(std::vector<int>{MOVE_RR, MOVE_L});
-		skyMoves.push_back(std::vector<int>{MOVE_R, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_R});
-
-		// all of the sky positions are the same for L, J, and T
-		if (mino == MINO_L || mino == MINO_J || mino == MINO_T) {
-			// 180 rotation
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_LL});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_LL, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_L});
-			skyMoves.push_back(std::vector<int>{ROT_180});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_RR});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_RR, MOVE_L});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_R, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_180, MOVE_R});
-
-
-			// CCW rotation
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_LL});
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_L, MOVE_L});
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_L});
-
-			skyMoves.push_back(std::vector<int>{ROT_CCW});
-
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_R, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_RR});
-			skyMoves.push_back(std::vector<int>{MOVE_RR, ROT_CCW});
-			skyMoves.push_back(std::vector<int>{MOVE_RR, ROT_CCW, MOVE_L});
-
-
-			// CW rotation
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_LL});
-			skyMoves.push_back(std::vector<int>{MOVE_LL, ROT_CW});
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_L});
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_L, MOVE_L});
-
-
-			skyMoves.push_back(std::vector<int>{ROT_CW});
-
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_R, MOVE_R});
-			skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_LL});
-
-
-		}
-	}
-
-	// S and Z are the same
-	if (mino == MINO_Z || mino == MINO_S) {
-		// rotation position 2
-		skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_LL});
-		skyMoves.push_back(std::vector<int>{MOVE_LL, ROT_CW});
-		skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_L});
-
-		skyMoves.push_back(std::vector<int>{ROT_CCW});
-
-		skyMoves.push_back(std::vector<int>{ROT_CW});
-		skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_R});
-		skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_R, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_RR, ROT_CW});
-		skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_RR});
-
-
-	}
-
-
-	if (mino == MINO_I) {
-		// no rotation
-		skyMoves.push_back(std::vector<int>{MOVE_LL});
-		skyMoves.push_back(std::vector<int>{MOVE_L, MOVE_L});
-		skyMoves.push_back(std::vector<int>{MOVE_L});
-
-		skyMoves.push_back(std::vector<int>{});
-
-		skyMoves.push_back(std::vector<int>{MOVE_RR});
-		skyMoves.push_back(std::vector<int>{MOVE_R, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_R});
-
-
-		// rotated once
-		skyMoves.push_back(std::vector<int>{ROT_CCW});
-		skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_L});
-		skyMoves.push_back(std::vector<int>{MOVE_LL, ROT_CW});
-		skyMoves.push_back(std::vector<int>{MOVE_LL, ROT_CCW});
-		skyMoves.push_back(std::vector<int>{ROT_CCW, MOVE_LL});
-
-		skyMoves.push_back(std::vector<int>{ROT_CW});
-		skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_RR, ROT_CCW});
-		skyMoves.push_back(std::vector<int>{MOVE_RR, ROT_CW});
-		skyMoves.push_back(std::vector<int>{ROT_CW, MOVE_RR});
-	}
-
-	if (mino == MINO_O) {
-		// only one rotation for this
-		skyMoves.push_back(std::vector<int>{MOVE_LL});
-		skyMoves.push_back(std::vector<int>{MOVE_LL, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_L, MOVE_L});
-		skyMoves.push_back(std::vector<int>{MOVE_L});
-		skyMoves.push_back(std::vector<int>{});
-
-		skyMoves.push_back(std::vector<int>{MOVE_RR});
-		skyMoves.push_back(std::vector<int>{MOVE_RR, MOVE_L});
-		skyMoves.push_back(std::vector<int>{MOVE_R, MOVE_R});
-		skyMoves.push_back(std::vector<int>{MOVE_R});
-	}
+	
 
 
 

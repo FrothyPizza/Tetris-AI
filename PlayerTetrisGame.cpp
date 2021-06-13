@@ -68,42 +68,113 @@ void PlayerTetrisGame::render(sf::RenderWindow* window, sf::Vector2f position, f
 	renderTetris(window, position, tileSize, rect, gameState, curMino, nextList);
 }
 
-void PlayerTetrisGame::inputRight(bool rightPressed) {
+//void PlayerTetrisGame::inputRight(bool rightPressed) {
+//	if (rightPressed && RclockRestarted == false) {
+//		Rclock.restart();
+//		RclockRestarted = true;
+//		gameState.moveX(curMino, 1);
+//	}
+//	else {
+//		if (rightPressed == false) RclockRestarted = false;
+//	}
+//	if (Rclock.getElapsedTime().asMilliseconds() > das && rightPressed) {
+//		gameState.arrX(curMino, 1);
+//		LclockRestarted = false;
+//	}
+//
+//
+//
+//}
+//
+//void PlayerTetrisGame::inputLeft(bool leftPressed) {
+//	if (leftPressed && LclockRestarted == false) {
+//		Lclock.restart();
+//		LclockRestarted = true;
+//		gameState.moveX(curMino, -1);
+//	}
+//	else {
+//		if (leftPressed == false) LclockRestarted = false;
+//	}
+//	if (Lclock.getElapsedTime().asMilliseconds() > das && leftPressed) {
+//		//m_gameState.moveX(m_currentTetromino, -1);
+//		gameState.arrX(curMino, -1);
+//		RclockRestarted = false;
+//	}
+//}
+
+void PlayerTetrisGame::inputRight(bool rightPressed, bool leftPressed) {
+	if (leftPressed) return;
+	//if (leftPressed && RARRClock.getElapsedTime().asMilliseconds() > 0) {
+	//	Lclock.restart();
+	//}
+
 	if (rightPressed && RclockRestarted == false) {
 		Rclock.restart();
 		RclockRestarted = true;
 		gameState.moveX(curMino, 1);
+
 	}
 	else {
 		if (rightPressed == false) RclockRestarted = false;
 	}
-	if (Rclock.getElapsedTime().asMilliseconds() > das && rightPressed) {
-		gameState.arrX(curMino, 1);
-		LclockRestarted = false;
+	if (arr > 0) {
+		if (Rclock.getElapsedTime().asMilliseconds() > das && rightPressed) {
+			if (RARRClock.getElapsedTime().asMilliseconds() > arr) {
+				RARRClock.restart();
+				gameState.moveX(curMino, 1);
+			}
+
+		}
 	}
-
-
-
+	else {
+		if (Rclock.getElapsedTime().asMilliseconds() > das && rightPressed) {
+			gameState.arrX(curMino, 1);
+			RclockRestarted = false;
+		}
+	}
 }
 
-void PlayerTetrisGame::inputLeft(bool leftPressed) {
+void PlayerTetrisGame::inputLeft(bool leftPressed, bool rightPressed) {
+	if (rightPressed) return;
+	//if (rightPressed && LARRClock.getElapsedTime().asMilliseconds() > 0) {
+	//	Rclock.restart();
+	//}
+
 	if (leftPressed && LclockRestarted == false) {
 		Lclock.restart();
 		LclockRestarted = true;
 		gameState.moveX(curMino, -1);
+
 	}
 	else {
 		if (leftPressed == false) LclockRestarted = false;
 	}
-	if (Lclock.getElapsedTime().asMilliseconds() > das && leftPressed) {
-		//m_gameState.moveX(m_currentTetromino, -1);
-		gameState.arrX(curMino, -1);
-		RclockRestarted = false;
+	if (arr > 0) {
+		if (Lclock.getElapsedTime().asMilliseconds() > das && leftPressed) {
+			if (LARRClock.getElapsedTime().asMilliseconds() > arr) {
+				LARRClock.restart();
+				gameState.moveX(curMino, -1);
+			}
+		}
+	}
+	else {
+		if (Lclock.getElapsedTime().asMilliseconds() > das && leftPressed) {
+			gameState.arrX(curMino, -1);
+			RclockRestarted = false;
+		}
 	}
 }
 
 void PlayerTetrisGame::inputDown() {
-	gameState.hardDropWithoutPaste(curMino);
+	if (sdf == 0) {
+		gameState.hardDropWithoutPaste(curMino);
+	}
+	else {
+		if (SDFClock.getElapsedTime().asMilliseconds() > sdf) {
+			SDFClock.restart();
+			gameState.softDrop(curMino);
+		}
+	}
 }
 
 int PlayerTetrisGame::inputGeneral(int keyCode) {
@@ -123,8 +194,7 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 
 		int attack = gameState.lastPlacementAttack();
 
-
-		std::cout << "Eval: " << ts::evaluate(gameState, ts::mainFactors)<<'\n';
+		//std::cout << "Eval: " << ts::evaluate(gameState, ts::mainFactors)<<'\n';
 		//// handle back to back
 		//if (clear == 4 || gameState.getLastTSpin() != gameState.NO_TSPIN && clear > 0) {
 		//	gameState.b2b++;
@@ -137,19 +207,19 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 		return attack;
 	}
 
-	if (keyCode == sf::Keyboard::C) {
+	if (keyCode == ts::Globals::CONTROLS["hold"]) {
 		gameState.performHold(gameState, curMino, nextList);
 	}
-	if (keyCode == sf::Keyboard::Up) {
+	if (keyCode == ts::Globals::CONTROLS["rot_cw"]) {
 		gameState.rotate(curMino, 1);
 	}
-	if (keyCode == sf::Keyboard::Z) {
+	if (keyCode == ts::Globals::CONTROLS["rot_ccw"]) {
 		gameState.rotate(curMino, -1);
 	}
-	if (keyCode == sf::Keyboard::X) {
+	if (keyCode == ts::Globals::CONTROLS["rot_180"]) {
 		gameState.rotate(curMino, 2);
 	}
-	if (keyCode == sf::Keyboard::Q) {
+	if (keyCode == ts::Globals::CONTROLS["restart"]) {
 		gameState.resetMatrix();
 	}
 

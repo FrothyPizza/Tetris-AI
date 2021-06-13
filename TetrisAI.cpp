@@ -106,8 +106,8 @@ namespace ts {
 
 			if (clear <= 0) gameState.placeGarbage();
 			//std::cout << "APP: " << (float)totalAttack / (float)piecesPlaced << attack << std::endl;
-			//if(rand() % 2)recieveAttack(rand() % 3); ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+			//if(rand() % 3 == 0)recieveAttack(1); ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//gameState.placeGarbage(); /////////////////////////////////////
 		}
 		else {
 			executeMove(gameState, curMino, currentMove, 0, nextList);
@@ -135,14 +135,6 @@ namespace ts {
 
 		int attack = gameState.lastPlacementAttack();
 
-		//// handle back to back;
-		//if (cleared == 4 || Tspin != gameState.NO_TSPIN && cleared > 0) {
-		//	gameState.b2b++;
-		//}
-		//else {
-		//	if (cleared > 0) gameState.b2b = 0;
-		//}
-
 
 
 		if (currentMove.at(0) != HOLD) {
@@ -159,7 +151,7 @@ namespace ts {
 
 
 
-		//std::cout << "APP: " << (float)totalAttack / (float)piecesPlaced << attack << std::endl;
+		/*std::cout << "APP: " << (float)totalAttack / (float)piecesPlaced << attack << std::endl;*/
 		return attack;
 	}
 

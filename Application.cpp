@@ -8,7 +8,7 @@ void Application::initVars() {
 	AIdelay.restart();
 	attackToPlayer = std::async(&ts::TetrisAI::doNextMove, &tetrisAI);
 
-	ts::Globals::InitVars();
+	
 }
 
 void Application::initWindow() {
@@ -62,16 +62,23 @@ void Application::pollEvents() {
 			int attack = playerGame.inputGeneral(m_event.key.code);
 			playerGame.gameState.cancelGarbage(attack);
 			tetrisAI.recieveAttack(attack);
-			switch (m_event.key.code) {
-				case sf::Keyboard::Escape:
-					m_window->close();
-					break;
-				case sf::Keyboard::Q:
-					tetrisAI.reset();
-					break;
 
-
+			if (m_event.key.code == ts::Globals::CONTROLS["close"]) {
+				m_window->close();
 			}
+			if (m_event.key.code == ts::Globals::CONTROLS["restart"]) {
+				tetrisAI.reset();
+			}			
+			//switch (m_event.key.code) {
+			//	case sf::Keyboard::Escape:
+			//		m_window->close();
+			//		break;
+			//	case sf::Keyboard::Q:
+			//		tetrisAI.reset();
+			//		break;
+
+
+			//}
 
 			break;
 		}
@@ -112,10 +119,10 @@ void Application::update() {
 		}
 	}
 
-	playerGame.inputRight(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
-	playerGame.inputLeft(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
+	playerGame.inputRight(sf::Keyboard::isKeyPressed(ts::Globals::CONTROLS["right"]), sf::Keyboard::isKeyPressed(ts::Globals::CONTROLS["left"]));
+	playerGame.inputLeft(sf::Keyboard::isKeyPressed(ts::Globals::CONTROLS["left"]), sf::Keyboard::isKeyPressed(ts::Globals::CONTROLS["right"]));
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+	if (sf::Keyboard::isKeyPressed(ts::Globals::CONTROLS["soft_drop"])) {
 		playerGame.inputDown();
 	}
 }

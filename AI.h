@@ -89,7 +89,120 @@ namespace ts {
 
 
 
+	const static std::vector<std::vector<int>> szMoves{
+		// no rot
+		{MOVE_LL},
+		{MOVE_LL, MOVE_R},
+		{MOVE_L},
+		{},
+		{MOVE_RR},
+		{MOVE_RR, MOVE_L},
+		{MOVE_R, MOVE_R},
+		{MOVE_R},
 
+		{ROT_CCW, MOVE_LL},
+		{MOVE_LL, ROT_CW},
+		{ROT_CCW, MOVE_L},
+
+		{ROT_CCW},
+
+		{ROT_CW},
+		{ROT_CW, MOVE_R},
+		{ROT_CW, MOVE_R, MOVE_R},
+		{MOVE_RR, ROT_CW},
+		{ROT_CW, MOVE_RR},
+	};
+
+
+	const static std::vector<std::vector<int>> ljtMoves{
+		// no rot
+		{MOVE_LL},
+		{MOVE_LL, MOVE_R},
+		{MOVE_L},
+		{},
+		{MOVE_RR},
+		{MOVE_RR, MOVE_L},
+		{MOVE_R, MOVE_R},
+		{MOVE_R},
+
+		{ROT_180, MOVE_LL},
+		{ROT_180, MOVE_LL, MOVE_R},
+		{ROT_180, MOVE_L},
+		{ROT_180},
+		{ROT_180, MOVE_RR},
+		{ROT_180, MOVE_RR, MOVE_L},
+		{ROT_180, MOVE_R, MOVE_R},
+		{ROT_180, MOVE_R},
+
+
+		// CCW rotation
+		{ROT_CCW, MOVE_LL},
+		{ROT_CCW, MOVE_L, MOVE_L},
+		{ROT_CCW, MOVE_L},
+
+		{ROT_CCW},
+
+		{ROT_CCW, MOVE_R},
+		{ROT_CCW, MOVE_R, MOVE_R},
+		{ROT_CCW, MOVE_RR},
+		{MOVE_RR, ROT_CCW},
+		{MOVE_RR, ROT_CCW, MOVE_L},
+
+
+		// CW rotation
+		{ROT_CW, MOVE_LL},
+		{MOVE_LL, ROT_CW},
+		{ROT_CW, MOVE_L},
+		{ROT_CW, MOVE_L, MOVE_L},
+
+
+		{ROT_CW},
+
+		{ROT_CW, MOVE_R},
+		{ROT_CW, MOVE_R, MOVE_R},
+		{ROT_CW, MOVE_LL},
+	};
+
+
+	const static std::vector<std::vector<int>> oMoves{
+		// no rot
+		{MOVE_LL},
+		{MOVE_LL, MOVE_R},
+		{MOVE_L},
+		{MOVE_L, MOVE_L},
+		{MOVE_L},
+		{},
+		{MOVE_RR},
+		{MOVE_RR, MOVE_L},
+		{MOVE_R, MOVE_R},
+		{MOVE_R}
+	};
+
+	const static std::vector<std::vector<int>> iMoves{
+		// no rotation
+		{MOVE_LL},
+		{MOVE_L, MOVE_L},
+		{MOVE_L},
+
+		{},
+
+		{MOVE_RR},
+		{MOVE_R, MOVE_R},
+		{MOVE_R},
+
+		// rotated once
+		{ROT_CCW},
+		{ROT_CCW, MOVE_L},
+		{MOVE_LL, ROT_CW},
+		{MOVE_LL, ROT_CCW},
+		{ROT_CCW, MOVE_LL},
+
+		{ROT_CW},
+		{ROT_CW, MOVE_R},
+		{MOVE_RR, ROT_CCW},
+		{MOVE_RR, ROT_CW},
+		{ROT_CW, MOVE_RR}
+	};
 
 
 }
