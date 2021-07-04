@@ -482,7 +482,7 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 
 
 	std::vector<std::vector<int>> allMoves;
-	allMoves.reserve(60);
+	allMoves.reserve(40);
 
 	// all of the positions in the air before hard drop
 	std::vector<std::vector<int>> skyMoves;
@@ -494,10 +494,31 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 	if (mino == MINO_Z || mino == MINO_S)
 		skyMoves = szMoves;
 	if (mino == MINO_I)
-		skyMoves = iMoves;
-	if (mino == MINO_O)
+		skyMoves = iMoves; 
+	if (mino == MINO_O) 
 		skyMoves = oMoves;
 
+
+
+	//// Potential unique moves solution plan ////
+	// 1. find all holes
+	// 2. for each hole, try placing the tetromino in the hole
+	// 3. if the tetromino fits in that spot and it can't move up (no sky access), then it is a new unique move
+	// 4. pathfind to the unique spot(s)
+
+	if (Globals::AI_USE_UNIQUE_MOVES) {
+
+		std::vector<Point> holes; holes.reserve(5);
+		for (int i = 0; i < WIDTH; ++i) {
+			for (int j = 0; j < HEIGHT - 1; ++j) {
+				if (gameState.matrix[i][j] >= 0 && gameState.matrix[i][j + 1] == -1)
+					holes.push_back({ i, j });
+
+			}
+		}
+
+
+	}
 	
 
 
@@ -505,9 +526,26 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 	//// Find unique positions /////////////////////////////////////////////////////////////
 	// (doesn't work)
 	if (Globals::AI_USE_UNIQUE_MOVES) {
+
 		Tetromino m{ mino };
 
-		std::vector<int> fakeNext{ 0 }; // fake next list so the fullyPerformMove call is valid
+		int possibleMinoRotations{ 2 };
+		if (mino == MINO_I || mino == MINO_S || mino == MINO_Z)
+			possibleMinoRotations = 2;
+		else if (mino == MINO_O)
+			possibleMinoRotations = 1;
+		else 
+			possibleMinoRotations = 4;
+
+		std::vector<int> rotationActions;
+		if (possibleMinoRotations == 2)
+			rotationActions = std::vector<int>{ 0, 1 };
+		if (possibleMinoRotations == 1)
+			rotationActions = std::vector<int>{ 0 };
+		if (possibleMinoRotations == 4)
+			rotationActions = std::vector<int>{ 0, 1, 2, -1 };
+
+		std::vector<int> fakeNext{ }; // fake next list so the fullyPerformMove call is valid
 										// this is kinda hackey, but whatever
 
 		// endPositions is all ending positions of the tetromino for each move
@@ -529,46 +567,69 @@ std::vector<std::vector<int>> ts::getAllMoves(GameState& gameState, int mino) {
 
 			// add this endpostion to the vector
 			endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
-
+			//std::cout << m.rotation;
 
 			if (m.y < highestY) highestY = m.y;
 			if (m.y > lowestY) lowestY = m.y;
 		}
 
+		//for (size_t i = 0; i < endPositions.size(); ++i) { /////////////////////////////////////////////////////////////////////////////////////////
+			//std::cout << endPositions[i].x << " " << endPositions[i].y << " " << endPositions[i].rot << '\n';
+		//}
+
 		std::vector<EndPosition> newEndPositions;
 		newEndPositions.reserve(5);
 		for (int i = 0; i < WIDTH; ++i) {
-			for (int j = highestY; j < lowestY; ++j) {
-				m.setTetromino(mino);
-				m.x = i;
-				m.y = j;
+			//for (int j = highestY; j < lowestY; ++j) {
+			for (int j = 0; j < HEIGHT; ++j) {
 
-				if (gameState.matrixContains(m)) continue;
-				gameState.hardDropWithoutPaste(m);
+				for (int r = 0; r < possibleMinoRotations; ++r) {
+					m.setTetromino(mino);
 
-				bool isNew{ true };
-				for (size_t c = 0; c < endPositions.size(); ++c) {
-					// if it is the same as an already existing end position
-					if (m.x == endPositions[c].x &&
-					    m.y == endPositions[c].y &&
-					    m.rotation == endPositions[c].rot) {
-						isNew = false;
-						break;
+					if(rotationActions[r] != 0) gameState.rotate(m, rotationActions[r]);
+
+					m.x = i;
+					m.y = j;
+
+					if (gameState.matrixContains(m)) continue;
+					gameState.hardDropWithoutPaste(m);
+
+					bool isNew{ true };
+					for (size_t c = 0; c < endPositions.size(); ++c) {
+						// if it is the same as an already existing end position
+
+						bool sameRot = false;
+						if (mino == MINO_I || mino == MINO_S || mino == MINO_Z)
+							if ((m.rotation == 3 || m.rotation == 1) && (endPositions[c].rot == 3 || endPositions[c].rot == 1))
+								sameRot = true;
+						if (m.x == endPositions[c].x &&
+							m.y == endPositions[c].y &&
+							(m.rotation == endPositions[c].rot || sameRot)) {
+							isNew = false;
+							break;
+						}
+					}
+
+					if (isNew) {
+						endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
+						newEndPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
 					}
 				}
-
-				if (isNew) {
-					endPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
-					newEndPositions.push_back(EndPosition{ m.x, m.y, m.rotation });
-				}
-				
 			}
 		}
 		//std::cout << "\nUnique End Positions " << newEndPositions.size() << ", Non unique: " << endPositions.size();
 
-		for (size_t i = 0; i < newEndPositions.size(); ++i) {
-			//allMoves.push_back(pathfindToEndPosition(gameState, mino, newEndPositions[i], 5));
+		for (size_t i = 0; i < endPositions.size(); ++i) { /////////////////////////////////////////////////////////////////////////////////////////
+			std::cout << endPositions[i].x << " " << endPositions[i].y << " " << endPositions[i].rot << '\n';
 		}
+		std::cout << '\n';
+		for (size_t i = 0; i < newEndPositions.size(); ++i) {
+			std::cout << newEndPositions[i].x << " " << newEndPositions[i].y << " " << newEndPositions[i].rot << '\n'; ////////////////////////
+			std::vector<int> move = pathfindToEndPosition(gameState, mino, newEndPositions[i], 5);
+			if(move.size() != 0)
+				allMoves.push_back(move);
+		}
+
 
 
 	}
@@ -602,13 +663,22 @@ std::vector<int> ts::pathfindToEndPosition(GameState& gameState, int mino, EndPo
 	static const int moves[5]{ MOVE_DD, MOVE_R, MOVE_L, ROT_CW, ROT_CCW };
 
 
+	
+
+
 	// Brute force because why not
 	// 
 	Tetromino startMino{ mino };
 
 	std::vector<std::vector<int>> allMoves;
 
-
+	for (int a = 0; a < 5; ++a)
+		for(int b = 0; b < 5; ++b)
+			for (int c = 0; c < 5; ++c)
+				for (int d = 0; d < 5; ++d)
+					for (int e = 0; e < 5; ++e)
+						for (int f = 0; f < 5; ++f)
+							allMoves.push_back({ moves[a],moves[b],moves[c],moves[d],moves[e],moves[f],MOVE_DD });
 
 
 	std::vector<int> fakeNext{};

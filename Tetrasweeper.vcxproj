@@ -154,6 +154,7 @@
     <ClCompile Include="TetrisAI.cpp" />
     <ClCompile Include="TetrisRender.cpp" />
     <ClCompile Include="Tetromino.cpp" />
+    <ClCompile Include="WindowsTetrisScreenManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="TetrisAI.h" />
     <ClInclude Include="TetrisRender.h" />
     <ClInclude Include="Tetromino.h" />
+    <ClInclude Include="WindowsTetrisScreenManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <string>
 
+#include <SFML/System/Time.hpp>
+
+
 int ts::Globals::DAS{ 80 };
 int ts::Globals::ARR{ 0 };
 int ts::Globals::SDF{ 0 };
@@ -18,9 +21,19 @@ bool ts::Globals::TURN_BASED{ false };
 
 std::unordered_map<std::string, sf::Keyboard::Key> ts::Globals::ALL_KEYS;
 std::unordered_map<std::string, sf::Keyboard::Key> ts::Globals::CONTROLS;
+std::unordered_map<std::string, sf::SoundBuffer> ts::Globals::SOUND_BUFFERS;
+std::unordered_map<std::string, sf::Sound> ts::Globals::SOUNDS;
+
 
 void ts::Globals::InitVars() {
 	InitAllKeys();
+
+	SOUND_BUFFERS["hard_drop"].loadFromFile("Sounds/hard_drop.wav");
+	SOUNDS["hard_drop"].setBuffer(SOUND_BUFFERS["hard_drop"]);
+	SOUNDS["hard_drop"].setVolume(50.f);
+
+	SOUND_BUFFERS["line_clear"].loadFromFile("Sounds/line_clear.wav");
+	SOUNDS["line_clear"].setBuffer(SOUND_BUFFERS["line_clear"]);
 
     std::ifstream file("config.ini");
     if (file.is_open()) {
@@ -79,7 +92,7 @@ void ts::Globals::InitVars() {
 
 
 		}
-
+		
 	}
 	else {
 		std::cout << "Controls file not opened";

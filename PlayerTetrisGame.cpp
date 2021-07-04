@@ -103,10 +103,11 @@ void PlayerTetrisGame::render(sf::RenderWindow* window, sf::Vector2f position, f
 //}
 
 void PlayerTetrisGame::inputRight(bool rightPressed, bool leftPressed) {
-	if (leftPressed) return;
-	//if (leftPressed && RARRClock.getElapsedTime().asMilliseconds() > 0) {
-	//	Lclock.restart();
-	//}
+	//if (leftPressed) return;
+	if (leftPressed && RARRClock.getElapsedTime().asMilliseconds() > 0 && rightPressed) {
+		Lclock.restart();
+	}
+
 
 	if (rightPressed && RclockRestarted == false) {
 		Rclock.restart();
@@ -129,16 +130,16 @@ void PlayerTetrisGame::inputRight(bool rightPressed, bool leftPressed) {
 	else {
 		if (Rclock.getElapsedTime().asMilliseconds() > das && rightPressed) {
 			gameState.arrX(curMino, 1);
-			RclockRestarted = false;
+			//RclockRestarted = false;
 		}
 	}
 }
 
 void PlayerTetrisGame::inputLeft(bool leftPressed, bool rightPressed) {
-	if (rightPressed) return;
-	//if (rightPressed && LARRClock.getElapsedTime().asMilliseconds() > 0) {
-	//	Rclock.restart();
-	//}
+	//if (rightPressed) return;
+	if (rightPressed && LARRClock.getElapsedTime().asMilliseconds() > 0 && leftPressed) {
+		Rclock.restart();
+	}
 
 	if (leftPressed && LclockRestarted == false) {
 		Lclock.restart();
@@ -160,7 +161,7 @@ void PlayerTetrisGame::inputLeft(bool leftPressed, bool rightPressed) {
 	else {
 		if (Lclock.getElapsedTime().asMilliseconds() > das && leftPressed) {
 			gameState.arrX(curMino, -1);
-			RclockRestarted = false;
+			//LclockRestarted = false;
 		}
 	}
 }
@@ -179,7 +180,9 @@ void PlayerTetrisGame::inputDown() {
 
 int PlayerTetrisGame::inputGeneral(int keyCode) {
 	// hard drop
-	if (keyCode == sf::Keyboard::Space) {
+	if (keyCode == ts::Globals::CONTROLS["hard_drop"]) {
+		
+
 		int mino = curMino.mino;
 		ts::Tetromino oldMino{ curMino };
 		ts::GameState oldState{ gameState };
@@ -204,6 +207,21 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 		//}
 
 		//if (clear == 0) attack = 0;
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//for (int i = 0; i < 5; ++i)
+		//	std::cout << '\n';
+		//ts::getAllMoves(gameState, curMino.mino);
+
+		if (clear == 0) {
+			ts::Globals::SOUNDS["hard_drop"].play();
+		}
+		else {
+			ts::Globals::SOUNDS["line_clear"].setPitch(gameState.combo / 16.f + 1);
+			ts::Globals::SOUNDS["line_clear"].play();
+		}
+
 		return attack;
 	}
 

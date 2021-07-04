@@ -75,6 +75,25 @@ namespace ts {
 		}
 	};
 
+	static constexpr const Point ZSTLJwallKickData[4][2][5]{
+		{ // 0
+			{{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}, // R
+			{{0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2}}     // L
+		},
+		{ // R
+			{{0, 0}, {1, 0}, {1, 1}, {0, -2}, {1, -2}},  // 2
+			{{0, 0}, {1, 0}, {1, 1}, {0, -2}, {1, -2}}  // 0
+		},
+		{ // 2
+			{{0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2}},  // L
+			{{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}  // R
+		},
+		{ // L
+			{{0, 0}, {-1, 0}, {-1, 1}, {0, -2}, {1, -2}},// 0
+			{{0, 0}, {-1, 0}, {-1, 1}, {0, -2}, {1, -2}}  // 2
+		}
+	};
+
 
 	enum Tetrominos {
 		MINO_L,
@@ -85,7 +104,7 @@ namespace ts {
 		MINO_I,
 		MINO_O,
 		GARBAGE,
-		UNCLEARABLE_GARBAGE // unclearable garbage is used for the ai so that when it looks ahead there can be garbage
+		UNCLEARABLE_GARBAGE // unclearable garbage is used for the ai so that when it looks ahead there can be garbage without it planning poorly
 	};
 	
 

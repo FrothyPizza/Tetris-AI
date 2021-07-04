@@ -35,6 +35,11 @@ namespace ts {
 		incomingGarbage.reserve(20);
 		memset(matrix, -1, sizeof(int)* WIDTH* HEIGHT);
 
+		//for (int i = 0; i < WIDTH; ++i) {
+		//	matrix.push_back(std::vector<int>{});
+		//	for (int j = 0; j < HEIGHT; ++j)
+		//		matrix[i].push_back(-1);
+		//}
 	}
 
 
@@ -109,6 +114,10 @@ namespace ts {
 
 				lastClear = clearLines();
 				lastAttack = getAttack(lastTSpin, mino.mino, lastClear);
+
+				///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//std::cout << "\nmino pos: " << mino.x << " " << mino.y << " " << mino.rotation << '\n';
+
 
 				// handle back to back
 				if (lastClear == 4 || lastTSpin != NO_TSPIN && lastClear > 0)
@@ -277,10 +286,24 @@ namespace ts {
 			lastMoveWasRot = true;
 			if (kickSuccess) lastMoveWasKick = true;
 			if (dir == 2) {
-				if (mino.rotation == 0) mino.rotation = 2;
-				if (mino.rotation == 1) mino.rotation = 3;
-				if (mino.rotation == 2) mino.rotation = 0;
-				if (mino.rotation == 3) mino.rotation = 1;
+				switch (mino.rotation) {
+				case 0:
+					mino.rotation = 2;
+					break;
+				case 1:
+					mino.rotation = 3;
+					break;
+				case 2:
+					mino.rotation = 0;
+					break;
+				case 3:
+					mino.rotation = 1;
+					break;
+				}
+				//if (mino.rotation == 0) mino.rotation = 2;
+				//if (mino.rotation == 1) mino.rotation = 3;
+				//if (mino.rotation == 2) mino.rotation = 0;
+				//if (mino.rotation == 3) mino.rotation = 1;
 			}
 			else {
 				mino.rotation += dir;
@@ -290,7 +313,7 @@ namespace ts {
 		}
 	}
 
-	// this doesn't have to be very efficient since the AI seldom uses kicks
+	// this doesn't have to be very efficient since the AI rarely uses kicks
 	bool GameState::wallKick(Tetromino& mino, int dir) {
 		int newRotation = mino.rotation;
 
@@ -304,19 +327,39 @@ namespace ts {
 		// if it isn't O or I
 		if (mino.mino < 5) {
 
-			// get kick data
-			const Point kicks[5]{
-				{wallKickData[mino.rotation][0].x - wallKickData[newRotation][0].x, wallKickData[mino.rotation][0].y - wallKickData[newRotation][0].y},
-				{wallKickData[mino.rotation][1].x - wallKickData[newRotation][1].x, wallKickData[mino.rotation][1].y - wallKickData[newRotation][1].y},
-				{wallKickData[mino.rotation][2].x - wallKickData[newRotation][2].x, wallKickData[mino.rotation][2].y - wallKickData[newRotation][2].y},
-				{wallKickData[mino.rotation][3].x - wallKickData[newRotation][3].x, wallKickData[mino.rotation][3].y - wallKickData[newRotation][3].y},
-				{wallKickData[mino.rotation][4].x - wallKickData[newRotation][4].x, wallKickData[mino.rotation][4].y - wallKickData[newRotation][4].y}
-			};
+			//// get kick data
+			//const Point kicks[5]{
+			//	{wallKickData[mino.rotation][0].x - wallKickData[newRotation][0].x, wallKickData[mino.rotation][0].y - wallKickData[newRotation][0].y},
+			//	{wallKickData[mino.rotation][1].x - wallKickData[newRotation][1].x, wallKickData[mino.rotation][1].y - wallKickData[newRotation][1].y},
+			//	{wallKickData[mino.rotation][2].x - wallKickData[newRotation][2].x, wallKickData[mino.rotation][2].y - wallKickData[newRotation][2].y},
+			//	{wallKickData[mino.rotation][3].x - wallKickData[newRotation][3].x, wallKickData[mino.rotation][3].y - wallKickData[newRotation][3].y},
+			//	{wallKickData[mino.rotation][4].x - wallKickData[newRotation][4].x, wallKickData[mino.rotation][4].y - wallKickData[newRotation][4].y}
+			//};
+
+			//for (int i = 0; i < 5; ++i) {
+			//	mino.x += kicks[i].x;
+			//	mino.y += kicks[i].y;
+
+			//	if (!matrixContains(mino)) {
+			//		return true;
+			//	}
+			//	else {
+			//		mino.x = storeX;
+			//		mino.y = storeY;
+			//	}
+			//}
+
+
 
 			for (int i = 0; i < 5; ++i) {
-				mino.x += kicks[i].x;
-				mino.y += kicks[i].y;
-
+				//mino.x += IwallKickData[mino.rotation][newRotation][i].x;
+				//mino.y += IwallKickData[mino.rotation][newRotation][i].y;
+				int nd = 0;
+				if (dir == 1) nd = 0;
+				if (dir == -1) nd = 1;
+				
+				mino.x += ZSTLJwallKickData[mino.rotation][nd][i].x;
+				mino.y += ZSTLJwallKickData[mino.rotation][nd][i].y;
 				if (!matrixContains(mino)) {
 					return true;
 				}
@@ -325,7 +368,6 @@ namespace ts {
 					mino.y = storeY;
 				}
 			}
-
 			return false;
 		}
 		else {

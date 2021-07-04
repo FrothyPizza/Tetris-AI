@@ -12,6 +12,7 @@ namespace ts {
 		currentMove{},
 		instant{ inst },
 		totalAttack{ 0 },
+		totalKeysPressed{ 0 },
 		piecesPlaced{ 0 },
 		dead{ false },
 		factors{ mainFactors } {
@@ -39,6 +40,8 @@ namespace ts {
 		//gameState.matrix[2][HEIGHT - 2] = -1;
 		//gameState.matrix[3][HEIGHT - 2] = -1;
 		//gameState.matrix[4][HEIGHT - 2] = -1;
+		//gameState.matrix[4][HEIGHT - 3] = 1;
+		//curMino.setTetromino(MINO_T);
 
 
 		// 2 wide downstack testing
@@ -157,7 +160,8 @@ namespace ts {
 
 	void TetrisAI::generateNextMove() {
 		currentMove = findBestMove(factors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS);
-
+		totalKeysPressed += currentMove.size();
+		//std::cout << "\nKPP = " << (float)totalKeysPressed / piecesPlaced;
 		//currentMove = getAIMove(factors, gameState, curMino.mino, nextList, 0, Globals::AI_LOOKAHEADS).first;
 		//for (int i = 0; i < currentMove.size(); ++i) std::cout << '\n' << currentMove.at(i);
 	}

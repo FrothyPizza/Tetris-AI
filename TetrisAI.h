@@ -25,6 +25,7 @@ namespace ts {
 		std::vector<int> currentMove;
 
 		int piecesPlaced;
+		int totalKeysPressed;
 		int totalAttack;
 
 		// default, makes own next list

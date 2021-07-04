@@ -17,6 +17,7 @@ namespace ts {
 	struct GameState {
 
 		int matrix[WIDTH][HEIGHT];
+		//std::vector<std::vector<int>> matrix;
 		std::vector<int> incomingGarbage;
 
 		int hold;

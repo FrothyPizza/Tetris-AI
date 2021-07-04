@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 namespace ts {
 
@@ -21,7 +22,7 @@ namespace ts {
 		float clearedDoubleOrTriple; // clearing a double or triple is bad
 		float highestHeight;
 	} static mainFactors = {
-		-90, -20, -10, -5, -40, -10, -10, 50.f, 40, -10, 0, 200, -70, -5  // main with lookaheads
+		-90, -20, -10, -5, -40, -10, -10, 50.f, 40, -10, 0, 1000, -100, -5  // main with lookaheads
 		//-25.f, -10.f, -3.f, -30.f, -30.f, -10.f, -5.f, 20.f, 10.f, -20.f, -30.f, -20.f  // downstacking with lookaheads
 		//-30, -20, -4, -5, -20.f, -10, -2, 0, 0, 0 // no lookaheads
 	};
@@ -47,7 +48,11 @@ namespace ts {
 
 		static void InitVars();
 
+		static std::unordered_map<std::string, sf::Sound> SOUNDS;
+
 	private:
+		static std::unordered_map<std::string, sf::SoundBuffer> SOUND_BUFFERS; ///////////////
+
 		static void InitAllKeys();
 		static std::unordered_map<std::string, sf::Keyboard::Key> ALL_KEYS;
 	};
