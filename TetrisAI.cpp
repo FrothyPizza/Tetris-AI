@@ -133,7 +133,7 @@ namespace ts {
 		generateNextMove();
 
 		int cleared = fullyPerformMove(gameState, curMino, currentMove, nextList);
-		int Tspin = gameState.getLastTSpin();
+		int Tspin = gameState.getLastTSpinAfterHardDrop();
 		int mino = curMino.mino;
 
 		int attack = gameState.lastPlacementAttack();

@@ -221,6 +221,8 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 			ts::Globals::SOUNDS["line_clear"].setPitch(gameState.combo / 16.f + 1);
 			ts::Globals::SOUNDS["line_clear"].play();
 		}
+		
+
 
 		return attack;
 	}
@@ -241,6 +243,13 @@ int PlayerTetrisGame::inputGeneral(int keyCode) {
 		gameState.resetMatrix();
 	}
 
+	if ((keyCode == ts::Globals::CONTROLS["rot_cw"] ||
+		keyCode == ts::Globals::CONTROLS["rot_ccw"] ||
+		keyCode == ts::Globals::CONTROLS["rot_180"]) &&
+		gameState.getLastTSpinBeforeHardDrop(curMino) != 0) {
+		//std::cout << "Tspin\n";
+		//ts::Globals::SOUNDS["t_spin"].play();
+	}
 
 
 	return 0;

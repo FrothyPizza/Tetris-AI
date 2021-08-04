@@ -95,7 +95,8 @@ namespace ts {
 
 		int lastPlacementAttack();
 		int lastPlacementClear();
-		int getLastTSpin() { return lastTSpin; }
+		int getLastTSpinAfterHardDrop() { return lastTSpin; }
+		int getLastTSpinBeforeHardDrop(Tetromino& mino) { return isTSpin(mino); }
 
 	private:
 		// returns the attack

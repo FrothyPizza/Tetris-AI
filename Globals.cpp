@@ -35,6 +35,10 @@ void ts::Globals::InitVars() {
 	SOUND_BUFFERS["line_clear"].loadFromFile("Sounds/line_clear.wav");
 	SOUNDS["line_clear"].setBuffer(SOUND_BUFFERS["line_clear"]);
 
+	SOUND_BUFFERS["t_spin"].loadFromFile("Sounds/t_spin.wav");
+	SOUNDS["t_spin"].setBuffer(SOUND_BUFFERS["t_spin"]);
+	SOUNDS["t_spin"].setVolume(25.f);
+
     std::ifstream file("config.ini");
     if (file.is_open()) {
         std::string line;

@@ -28,7 +28,7 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 
 			fullyPerformMove(allNewStates[i], mino, allMoves[i], newNext);
 			float evaluation = evaluate(allNewStates[i], AIfactor);
-			float atkScore = evaluateAttackScore(AIfactor, allNewStates[i].lastPlacementAttack(), allNewStates[i].lastPlacementClear(), allNewStates[i].getLastTSpin());
+			float atkScore = evaluateAttackScore(AIfactor, allNewStates[i].lastPlacementAttack(), allNewStates[i].lastPlacementClear(), allNewStates[i].getLastTSpinAfterHardDrop());
 			evaluation += atkScore;
 
 			attackEvaluations.push_back(atkScore);
@@ -82,7 +82,7 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 				fullyPerformMove(thisState, thisMino, move, newNext);
 
 				float evaluation = evaluate(thisState, AIfactor) + 
-					evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear(), thisState.getLastTSpin());
+					evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear(), thisState.getLastTSpinAfterHardDrop());
 
 				if (evaluation > bestScore) {
 					bestScore = evaluation;
@@ -115,7 +115,7 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 			fullyPerformMove(allNewStates[i], mino, allMovesWithHold[i], newNext);
 			float evaluation = evaluate(allNewStates[i], AIfactor);
 			float atkScore = evaluateAttackScore(
-				AIfactor, allNewStates[i].lastPlacementAttack(), allNewStates[i].lastPlacementClear(), allNewStates[i].getLastTSpin()
+				AIfactor, allNewStates[i].lastPlacementAttack(), allNewStates[i].lastPlacementClear(), allNewStates[i].getLastTSpinAfterHardDrop()
 			);
 			evaluation += atkScore;
 
@@ -170,7 +170,7 @@ std::vector<int> ts::findBestMove(AIFactor& AIfactor, GameState& currentState, i
 				std::vector<int> move = findBestMove(AIfactor, thisState, holdNext[0], newNext, thisPathAttackScore + attackEvaluations[bestIndexes[i]], depth - 1);
 				fullyPerformMove(thisState, thisMino, move, newNext);
 
-				float evaluation = evaluate(thisState, AIfactor) + evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear(), thisState.getLastTSpin());;
+				float evaluation = evaluate(thisState, AIfactor) + evaluateAttackScore(AIfactor, thisState.lastPlacementAttack(), thisState.lastPlacementClear(), thisState.getLastTSpinAfterHardDrop());;
 				if (evaluation > bestScore) {
 					bestScore = evaluation;
 					//bestMove = allMovesWithHold[bestIndexes[i));
@@ -772,7 +772,7 @@ std::pair<std::vector<int>, float> ts::getAIMove(AIFactor& AIfactor, GameState& 
 		fullyPerformMove(newState, mino, allMoves[i], newNext);
 
 		float evaluation = evaluate(newState, AIfactor);
-		float atkScore = evaluateAttackScore(AIfactor, newState.lastPlacementAttack(), newState.lastPlacementClear(), newState.getLastTSpin());
+		float atkScore = evaluateAttackScore(AIfactor, newState.lastPlacementAttack(), newState.lastPlacementClear(), newState.getLastTSpinAfterHardDrop());
 		
 		float overallScore;
 		if(depth > 0)
